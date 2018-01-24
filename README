@@ -58,6 +58,13 @@ Architecture-specific notes:
 
 Usage instructions:  Run "minerd --help" to see options.
 
+for solo miner
+./minerd -o http://localhost:8665 -u test -p test --no-getwork  -a sha256d --coinbase-addr=19zWRGbrodCHsDaCmLbogt5skw6RsEbMRw
+
+for pool miner
+
+./minerd -o stratum+tcp://localhost:3333 -u 19zWRGbrodCHsDaCmLbogt5skw6RsEbMRw:0 -p x
+
 Connecting through a proxy:  Use the --proxy option.
 To use a SOCKS proxy, add a socks4:// or socks5:// prefix to the proxy host.
 Protocols socks4a and socks5h, allowing remote name resolving, are also
