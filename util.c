@@ -643,7 +643,7 @@ out:
 
 static int b58check(unsigned char *bin, size_t binsz, const char *b58)
 {
-	unsigned char buf[32];
+	unsigned char buf[32] = {0};
 	int i;
 
 	sha256d(buf, bin, binsz - 4);
@@ -661,7 +661,7 @@ static int b58check(unsigned char *bin, size_t binsz, const char *b58)
 
 size_t address_to_script(unsigned char *out, size_t outsz, const char *addr)
 {
-	unsigned char addrbin[25];
+	unsigned char addrbin[25] = {0};
 	int addrver;
 	size_t rv;
 

@@ -137,6 +137,7 @@ static char *rpc_userpass;
 static char *rpc_user, *rpc_pass;
 static int pk_script_size;
 static unsigned char pk_script[25];
+static char	coinbase_address[40];
 static char coinbase_sig[101] = "";
 char *opt_cert;
 char *opt_proxy;
@@ -826,12 +827,12 @@ static bool get_upstream_work(CURL *curl, struct work *work)
 start:
 	gettimeofday(&tv_start, NULL);
 	if (have_gbt) {
-		int len = strlen(gbt_req) + pk_script_size + 1; 
+		int len = strlen(gbt_req) + 40; 
 		assert(pk_script_size > 0);
 		req = malloc(len);
 		assert(req);
 		memset(req, 0, len);
-		snprintf(req, gbt_req, pk_script);
+		snprintf(req, len, gbt_req, coinbase_address);
 	}
 	val = json_rpc_call(curl, rpc_url, rpc_userpass,
 			    have_gbt ? req : getwork_req,
@@ -1325,12 +1326,12 @@ start:
 		int err;
 
 		if (have_gbt) {
-			int len = strlen(gbt_lp_req) + strlen(lp_id) + pk_script_size + 1;
+			int len = strlen(gbt_lp_req) + strlen(lp_id) + 40;
 			assert(pk_script_size > 0);
 			req = malloc(len);
 			assert(req);
 			memset(req, 0, len);
-			snprintf(req, len, gbt_lp_req, lp_id, pk_script);
+			snprintf(req, len, gbt_lp_req, lp_id, coinbase_address);
 		}
 		val = json_rpc_call(curl, lp_url, rpc_userpass,
 				    req ? req : getwork_req, &err,
@@ -1765,6 +1766,7 @@ static void parse_arg(int key, char *arg, char *pname)
 				pname, arg);
 			show_usage_and_exit(1);
 		}
+		snprintf(coinbase_address, 40, "%s", arg);
 		break;
 	case 1015:			/* --coinbase-sig */
 		if (strlen(arg) + 1 > sizeof(coinbase_sig)) {
