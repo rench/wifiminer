@@ -35,6 +35,7 @@
 #endif
 #include <jansson.h>
 #include <curl/curl.h>
+#include <assert.h>
 #include "compat.h"
 #include "miner.h"
 
@@ -810,10 +811,10 @@ static const char *getwork_req =
 
 static const char *gbt_req =
 	"{\"method\": \"getblocktemplate\", \"params\": [{\"capabilities\": "
-	GBT_CAPABILITIES ", \"rules\": " GBT_RULES "}], \"id\":0}\r\n";
+	GBT_CAPABILITIES ", \"rules\": " GBT_RULES ", \"coinbase-addr\": \"%s\"}], \"id\":0}\r\n";
 static const char *gbt_lp_req =
 	"{\"method\": \"getblocktemplate\", \"params\": [{\"capabilities\": "
-	GBT_CAPABILITIES ", \"rules\": " GBT_RULES ", \"longpollid\": \"%s\"}], \"id\":0}\r\n";
+	GBT_CAPABILITIES ", \"rules\": " GBT_RULES ", \"longpollid\": \"%s\", \"coinbase-addr\": \"%s\"}], \"id\":0}\r\n";
 
 static bool get_upstream_work(CURL *curl, struct work *work)
 {
@@ -821,12 +822,23 @@ static bool get_upstream_work(CURL *curl, struct work *work)
 	int err;
 	bool rc;
 	struct timeval tv_start, tv_end, diff;
-
+	char *req = NULL;
 start:
 	gettimeofday(&tv_start, NULL);
+	if (have_gbt) {
+		int len = strlen(gbt_req) + pk_script_size + 1; 
+		assert(pk_script_size > 0);
+		req = malloc(len);
+		assert(req);
+		memset(req, 0, len);
+		snprintf(req, gbt_req, pk_script);
+	}
 	val = json_rpc_call(curl, rpc_url, rpc_userpass,
-			    have_gbt ? gbt_req : getwork_req,
+			    have_gbt ? req : getwork_req,
 			    &err, have_gbt ? JSON_RPC_QUIET_404 : 0);
+	
+	if (have_gbt) free(req);
+
 	gettimeofday(&tv_end, NULL);
 
 	if (have_stratum) {
@@ -1313,13 +1325,17 @@ start:
 		int err;
 
 		if (have_gbt) {
-			req = malloc(strlen(gbt_lp_req) + strlen(lp_id) + 1);
-			sprintf(req, gbt_lp_req, lp_id);
+			int len = strlen(gbt_lp_req) + strlen(lp_id) + pk_script_size + 1;
+			assert(pk_script_size > 0);
+			req = malloc(len);
+			assert(req);
+			memset(req, 0, len);
+			snprintf(req, len, gbt_lp_req, lp_id, pk_script);
 		}
 		val = json_rpc_call(curl, lp_url, rpc_userpass,
 				    req ? req : getwork_req, &err,
 				    JSON_RPC_LONGPOLL);
-		free(req);
+		if(req) free(req);
 		if (have_stratum) {
 			if (val)
 				json_decref(val);
