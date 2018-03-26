@@ -735,6 +735,8 @@ bool fulltest(const uint32_t *hash, const uint32_t *target)
 			break;
 		}
 	}
+	
+	applog(LOG_DEBUG, "i %d hash %02x target %02x", hash[i], target[i]);
 
 	if (opt_debug) {
 		uint32_t hash_be[8], target_be[8];

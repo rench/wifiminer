@@ -128,7 +128,7 @@ static int opt_retries = -1;
 static int opt_fail_pause = 30;
 int opt_timeout = 0;
 static int opt_scantime = 5;
-static enum algos opt_algo = ALGO_SCRYPT;
+static enum algos opt_algo = ALGO_SHA256D;
 static int opt_scrypt_n = 1024;
 static int opt_n_threads;
 static int num_processors;
@@ -525,7 +525,7 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 		coinbase_append = true;
 	}
 	if (coinbase_append) {
-		unsigned char xsig[100];
+		unsigned char xsig[100] = {0};
 		int xsig_len = 0;
 		if (*coinbase_sig) {
 			n = strlen(coinbase_sig);
@@ -703,6 +703,8 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 		return true;
 	}
 
+	applog(LOG_ERR, "submit upstream work ======================");
+
 	if (have_stratum) {
 		uint32_t ntime, nonce;
 		char ntimestr[9], noncestr[9], *xnonce2str, *req;
@@ -717,6 +719,8 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 			"{\"method\": \"mining.submit\", \"params\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\"], \"id\":4}",
 			rpc_user, work->job_id, xnonce2str, ntimestr, noncestr);
 		free(xnonce2str);
+		
+		applog(LOG_ERR, "mining submit ======================");
 
 		rc = stratum_send_line(&stratum, req);
 		free(req);
@@ -1068,7 +1072,7 @@ err_out:
 
 static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 {
-	unsigned char merkle_root[64];
+	unsigned char merkle_root[64] = {0};
 	int i;
 
 	pthread_mutex_lock(&sctx->work_lock);
@@ -1124,7 +1128,7 @@ static void *miner_thread(void *userdata)
 	uint32_t max_nonce;
 	uint32_t end_nonce = 0xffffffffU / opt_n_threads * (thr_id + 1) - 0x20;
 	unsigned char *scratchbuf = NULL;
-	char s[16];
+	char s[16] = {0};
 	int i;
 
 	/* Set worker threads to nice 19 and then preferentially to SCHED_IDLE
@@ -1257,11 +1261,12 @@ static void *miner_thread(void *userdata)
 			for (i = 0; i < opt_n_threads && thr_hashrates[i]; i++)
 				hashrate += thr_hashrates[i];
 			if (i == opt_n_threads) {
-				sprintf(s, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * hashrate);
+				memset(s, 0, 16);
+				snprintf(s, 16, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * hashrate);
 				applog(LOG_INFO, "Total: %s khash/s", s);
 			}
 		}
-
+		
 		/* if nonce found, submit work */
 		if (rc && !opt_benchmark && !submit_work(mythr, &work))
 			break;

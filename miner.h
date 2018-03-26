@@ -138,13 +138,13 @@ void sha256d(unsigned char *hash, const unsigned char *data, int len);
 
 #ifdef USE_ASM
 #if defined(__ARM_NEON__) || defined(__ALTIVEC__) || defined(__i386__) || defined(__x86_64__)
-#define HAVE_SHA256_4WAY 1
+#define HAVE_SHA256_4WAY 0
 int sha256_use_4way();
 void sha256_init_4way(uint32_t *state);
 void sha256_transform_4way(uint32_t *state, const uint32_t *block, int swap);
 #endif
 #if defined(__x86_64__) && defined(USE_AVX2)
-#define HAVE_SHA256_8WAY 1
+#define HAVE_SHA256_8WAY 0
 int sha256_use_8way();
 void sha256_init_8way(uint32_t *state);
 void sha256_transform_8way(uint32_t *state, const uint32_t *block, int swap);
