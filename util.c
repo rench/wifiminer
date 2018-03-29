@@ -764,15 +764,30 @@ void diff_to_target(uint32_t *target, double diff)
 	uint64_t m;
 	int k;
 	
-	for (k = 6; k > 0 && diff > 1.0; k--)
-		diff /= 4294967296.0;
-	m = 4294901760.0 / diff;
-	if (m == 0 && k == 6)
-		memset(target, 0xff, 32);
-	else {
+	m = 4503595332403200.0 / diff;
+	if (m == 0) {
+		for (k = 6; k > 0 && diff > 1.0; k--)
+			diff /= 4294967296.0;
+		m = 1048575.0 / diff;
 		memset(target, 0, 32);
 		target[k] = (uint32_t)m;
-		target[k + 1] = (uint32_t)(m >> 32);
+		target[k+1] = (uint32_t)(m >> 32);
+	} else {
+		memset(target, 0, 32);
+		target[6] = (uint32_t)m;
+		target[7] = (uint32_t)(m >> 32); 
+	}
+	
+	if (opt_debug) {
+		uint32_t  target_be[8];
+		char  target_str[65];
+		
+		for (int i = 0; i < 8; i++) {
+			be32enc(target_be + i, target[7 - i]);
+		}
+		bin2hex(target_str, (unsigned char *)target_be, 32);
+
+		applog(LOG_DEBUG, "DEBUG: Target: %s", target_str);
 	}
 }
 
