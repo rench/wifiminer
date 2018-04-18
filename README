@@ -1,10 +1,8 @@
-This is a multi-threaded CPU miner for Litecoin and Bitcoin,
+This is a multi-threaded CPU miner for wfc,
 fork of Jeff Garzik's reference cpuminer.
 
 License: GPLv2.  See COPYING for details.
 
-Downloads:  https://sourceforge.net/projects/cpuminer/files/
-Git tree:   https://github.com/pooler/cpuminer
 
 Dependencies:
 	libcurl			http://curl.haxx.se/libcurl/
@@ -59,11 +57,11 @@ Architecture-specific notes:
 Usage instructions:  Run "minerd --help" to see options.
 
 for solo miner
-./minerd -o http://localhost:8665 -u test -p test --no-getwork  -a sha256d --coinbase-addr=19zWRGbrodCHsDaCmLbogt5skw6RsEbMRw
+./minerd -o http://localhost:8665 -u test -p test --no-getwork  -a sha256d --coinbase-addr=w9zWRGbrodCHsDaCmLbogt5skw6RsEbMRw
 
 for pool miner
 
-./minerd -o stratum+tcp://localhost:3333 -u 19zWRGbrodCHsDaCmLbogt5skw6RsEbMRw:0 -p x
+./minerd -o stratum+tcp://localhost:3333 -u w9zWRGbrodCHsDaCmLbogt5skw6RsEbMRw:0 -p x
 
 Connecting through a proxy:  Use the --proxy option.
 To use a SOCKS proxy, add a socks4:// or socks5:// prefix to the proxy host.
