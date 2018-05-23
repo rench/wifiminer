@@ -9,6 +9,7 @@ RUN sed -i -e 's/archive.ubuntu.com/mirrors.aliyun.com/' /etc/apt/sources.list &
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     export LC_ALL=C && \
     apt-get update && apt-get install unzip  && \
+    apt-get install tzdata && \
     apt-get install -y curl && apt-get install -y automake && \
     apt-get install -y build-essential && \
     apt-get install -y libcurl4-openssl-dev && \
