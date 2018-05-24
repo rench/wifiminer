@@ -13,6 +13,6 @@ a full wfcminer build and run environment docker image.
 ```
 docker run -d --rm --name wfcminer registry.cn-hangzhou.aliyuncs.com/wificoin-project/wfcminer:latest minerd -o http://x.x.x.x:9665 -u test -p admin  --no-getwork -a sha256d --coinbase-addr=wiijXST1RShBC4eAo56PqXoipX1RKFQ49o -t 2
 ```
-`x.x.x.x` 一般填写你本机的局域网ip地址.
+`x.x.x.x` General fill in your local LAN IP address.
 
-`--coinbase-addr` 后面的地址一定要替换成你自己的wfc接受地址.
+`--coinbase-addr` The following address must be replaced with your own wfc address.
